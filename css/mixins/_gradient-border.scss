@@ -1,0 +1,9 @@
+
+@mixin gradient-border-top-bottom($colorFrom, $colorTo){
+	border-style: solid;
+	-webkit-border-image: -webkit-gradient(linear, 0 0, 0 100%, from($colorFrom, to($colorTo))) 1 100%;
+	-webkit-border-image: -webkit-linear-gradient($colorFrom, $colorTo) 1 100%;
+	-moz-border-image:-moz-linear-gradient($colorFrom, $colorTo) 1 100%;    
+	-o-border-image:-o-linear-gradient($colorFrom, $colorTo) 1 100%;
+	border-image:linear-gradient(to bottom, $colorFrom, $colorTo) 1 100%;
+}

@@ -1,0 +1,30 @@
+
+
+// Mixins
+// --------------------------------------------------
+
+// Utilities
+@import "mixins/image";
+@import "mixins/responsive-visibility";
+@import "mixins/size";
+@import "mixins/text-overflow";
+@import "mixins/vendor-prefixes";
+
+
+// Layout
+@import "mixins/clearfix";
+@import "mixins/center-block";
+@import "mixins/nav-vertical-align";
+@import "mixins/grid-framework";
+@import "mixins/grid";
+
+
+//Niceness
+@import "mixins/gradient-border";
+
+@mixin opacity($opacity) {
+  opacity: $opacity;
+  $opacity-ie: $opacity * 100;
+  filter: alpha(opacity=$opacity-ie); //IE8
+}
+

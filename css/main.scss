@@ -1,0 +1,63 @@
+ @import 'bootstrap';
+ @import 'utilities';
+
+
+body {
+	background:#e7ecee;
+   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+   font-weight: 300;
+   color:#20303f;
+   font-size: 18px;
+}
+
+ .button{
+  background-color: #e53529;
+  border: solid 2px #e53529;
+  padding: 15px 15px;
+  color: #e7ecee;
+  text-decoration: none;
+  font-size: 20px;
+  border-radius: 5px;
+  width:100px;
+ }
+ h1{
+ 	font-size: 30px;
+ 	text-transform: uppercase;
+ 	margin-bottom:0;
+  margin-top: 30px;
+ }
+ h2{
+ 	font-size: 20px;
+ 	text-transform: uppercase;
+	margin-bottom:40px;
+  margin-top:5px;
+
+ }
+ select{
+ 	margin:0 5px;
+ 	margin-bottom: 20px;
+ }
+ ul{
+  font-size: 30px;
+  list-style:none;
+  margin-top:10px;
+  padding-left:15px;
+  li{
+    cursor:pointer;
+  }
+ }
+
+ .recordings-wrapper{
+    background-color: #e53529;
+      color: #e7ecee;
+
+    padding:10px;
+    margin:10px;
+    @include square(300px);
+    h3{
+        font-size: 30px;
+
+      margin-top:0;
+      margin-bottom:10px;
+    }
+ }
