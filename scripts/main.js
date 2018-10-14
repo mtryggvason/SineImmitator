@@ -1,8 +1,5 @@
 require.config({
 	baseUrl: 'scripts',
-	shim: {	
-		'lightbox':['jquery']
-	},
 	paths: {
 		'jquery':'jquery',
 	}

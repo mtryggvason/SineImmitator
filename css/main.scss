@@ -9,7 +9,6 @@ body {
    color:#20303f;
    font-size: 18px;
 }
-
  .button{
   background-color: #e53529;
   border: solid 2px #e53529;
@@ -20,6 +19,11 @@ body {
   border-radius: 5px;
   width:100px;
  }
+
+ .flex {
+   display: flex;
+ }
+
  h1{
  	font-size: 30px;
  	text-transform: uppercase;
@@ -48,15 +52,19 @@ body {
  }
 
  .recordings-wrapper{
+    position: absolute;
+    top: 0;
+    left: 0;
     background-color: #e53529;
-      color: #e7ecee;
-
-    padding:10px;
+    color: #e7ecee;
+    padding: 10px;
+    margin: 10px;
     margin:10px;
-    @include square(300px);
-    h3{
-        font-size: 30px;
+    overflow: scroll;
 
+    @include square(250px);
+    h3 {
+      font-size: 30px;
       margin-top:0;
       margin-bottom:10px;
     }
