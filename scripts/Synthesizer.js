@@ -13,7 +13,6 @@ define([
 		};	
 		var Synthesizer = function(args){
 			context = args.context;
-
 			this.output = context.createGain();
 			for(var i = 0;i < oscillatorCount; i++) {
 				oscillators[i]= context.createOscillator();
@@ -25,13 +24,13 @@ define([
 			this.output.gain.value = 1;
 
 			this.play = function(){
-				for(var i = 0;i<oscillatorCount;i++){
+				for(var i = 0; i < oscillatorCount; i++) {
 					oscillators[i].start(0);
 				}
 			};
 			this.stop = function(){
-				for(var i = 0;i<oscillatorCount;i++){
-					gains[i].gain.value =0;
+				for (var i = 0; i<oscillatorCount; i++) {
+					gains[i].gain.value = 0;
 				}
 			};
 

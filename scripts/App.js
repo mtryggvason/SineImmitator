@@ -22,77 +22,68 @@ define([
 			var PLAY_SOUND='PLAY';
 			var RECORD_SOUND ='RECORD';
 			var WIDTH = 400;
-			var HEIGHT = 440;
+			var HEIGHT = 400;
+			canvas.width = WIDTH;
+			canvas.height = HEIGHT;
 			var rafId;
 			var drawContext = canvas.getContext('2d');
 
 
-			this.init = function(){
+			this.init = async function(){
 				$('#osccount').change(function() {
 					oscCount = $(this).val();
 				});
 				synthesizer.output.connect(context.destination);
 				synthesizer.setVolume(0);
-				Microphone.init({context: context, userPermissionGranted:function(output){
-					var rec = new Recorder(output,{ workerPath: 'scripts/vendor/recorderWorker.js' });
-					$('.js-record-button').click(function(event) {
-						event.preventDefault();
-						if (recording) {
-							$(this).html(RECORD_SOUND);
-							rec.stop();
-							rec.getBuffer(function (buffers) {
-								recordBin.push({ buffers: buffers });
-								playbackFromSource(buffers);
-								createPlaybackLink();
-							});
-						} else {
-							for (var i = 0;i <= oscCount; i++) {
-								synthesizer.setOscillatorGain(0,i);
-							}
-							$(this).html(PLAY_SOUND);
-							rec = new Recorder(output,{workerPath:'scripts/vendor/recorderWorker.js'});
-							rec.record();
-						}
-						recording =!recording;
-					});
-				}
-			});
+				const stream = await Microphone.init();
+				const output = context.createMediaStreamSource(stream)
+				let rec = new Recorder(output,{ workerPath: 'scripts/vendor/recorderWorker.js' });
+				$('.js-record-button').click(function(event) {
+					event.preventDefault();
+					if (recording) {
+						$(this).html(RECORD_SOUND);
+						rec.stop();
+						rec.getBuffer(function (buffers) {
+							recordBin.push({ buffers: buffers });
+							playbackFromSource(buffers);
+							createPlaybackLink();
+						});
+					} else {
+						synthesizer.stop()
+						$(this).html(PLAY_SOUND);
+						rec = new Recorder(output,{workerPath:'scripts/vendor/recorderWorker.js'});
+						rec.record();
+					}
+					recording = !recording;
+				});
 				synthesizer.play();
 			};
 			this.visualize = function() {
-				canvas.width = WIDTH;
-				canvas.height = HEIGHT;
 				drawContext.clearRect(0, 0, WIDTH, HEIGHT);
-				var dataArray = new Uint8Array(analyser.frequencyBinCount);
+				const dataArray = new Uint8Array(analyser.frequencyBinCount);
 				analyser.getByteFrequencyData(dataArray);
-				var highestFrequencies;
 				var x = 10;
-				drawContext.font = '20px serif';
-				if (!recording) {
-					highestFrequencies= getHighestFrequencies(dataArray,oscCount);
-				}
-
-				highestFrequencies.forEach(function(item, index) {
-					var frequency = item.index * context.sampleRate / analyser.fftSize;
-					var gain = item.value / 255;
-					const barWidth = (WIDTH / oscCount);
-					const barHeight = item.value;
-					synthesizer.setOscillatorFrequency(frequency, index);
-					synthesizer.setOscillatorGain(gain, index);
-					drawContext.fillStyle = '#1887d4';
-					drawContext.fillRect(x, canvas.height - barHeight / 2 - 100, barWidth, barHeight);
-					drawContext.fillStyle = '#e53529';
-					x += barWidth + 1;
-				});
+				getHighestFrequencies(dataArray, oscCount)
+					.forEach(function(item, index) {
+						const frequency = item.index * context.sampleRate / analyser.fftSize;
+						const gain = item.value / 255;
+						const barWidth = (WIDTH / oscCount);
+						const barHeight = item.value;
+						synthesizer.setOscillatorFrequency(frequency, index);
+						synthesizer.setOscillatorGain(gain, index);
+						drawContext.fillStyle = '#1887d4';
+						drawContext.fillRect(x, canvas.height - barHeight / 2 - 100, barWidth, barHeight);
+						x += barWidth + 1;
+					});
 				rafId = requestAnimationFrame(self.visualize.bind(self));
 
 			};
 
 			var playbackFromSource = function(buffers){
+				if (!buffers[0].length) return
 				var source = context.createBufferSource();
 				source.buffer = context.createBuffer(1, buffers[0].length, context.sampleRate);
 				source.buffer.getChannelData(0).set(buffers[0]);
-				source.buffer.getChannelData(0).set(buffers[1]);
 				source.connect(analyser);
 				source.start();
 				synthesizer.setVolume(1);
@@ -106,24 +97,18 @@ define([
 			};
 
 			var createPlaybackLink = function(){
-				var listElement =document.createElement('li'); 
+				var listElement = document.createElement('li'); 
 				listElement.setAttribute('data-id',recordBin.length);
 				listElement.innerHTML = 'RECORDING '+recordBin.length;
+				$('.js-playback-links').append(listElement);
 				listElement.addEventListener('click', function() {
-					var sourceElement = recordBin[listElement.getAttribute('data-id')-1];
+					var sourceElement = recordBin[listElement.getAttribute('data-id') - 1];
 					playbackFromSource(sourceElement.buffers);
 				});
-				$('.js-playback-links').append(listElement);
 
 			};
 
-			var getHighestFrequencies = function(Arr, maxValuesCount){
-				var maxValues = [];
-				var previousValue =  { value:Number.POSITIVE_INFINITY, index:Number.NEGATIVE_INFINITY };
-				maxValues[0] = previousValue;
-				var highestValue= 0;
-				var highestIndex= 0;
-				
+			var getHighestFrequencies = function(Arr, maxValuesCount) {
 				return Array.from(Arr)
 					.map((value, index) => ({ value: value, index: index }))
 					.sort((a,b) => b.value - a.value)
