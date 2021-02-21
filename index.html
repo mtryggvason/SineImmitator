@@ -15,6 +15,7 @@
         <div>
             <div class="recordings-wrapper">
                 <h3>RECORDINGS</h3>
+                <p class="js-recordings-text">Click on a recording to play it again.</p>
                 <ul class="js-playback-links">
                 </ul>
             </div>
@@ -22,21 +23,10 @@
         <div style="position: relative; display: flex; justify-content: center; align-items: center; flex-grow: 1;overflow: hidden; margin:0 10px">
             <div class="text-center">
                 <canvas width="320" height="240"></canvas>
-                <h1 class="">Fun with Sine waves </h1>
+                <h1 class="">Fun with Sinus waves </h1>
                 <h2 class="">Record whatever you like and the computer <br> will try to immitate it using only sine waves.</h2>
                 <span>Number of Oscillators:</span>
-                <select  name="" id="osccount">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="50">50</option>
-                </select>
+                <input type="number" value="1" id="osccount" />
                 <a class="js-record-button button center-block" href="">RECORD</a>
             </div>
         </div>

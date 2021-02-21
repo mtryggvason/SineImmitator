@@ -97,6 +97,7 @@ define([
 			};
 
 			var createPlaybackLink = function(){
+				$('.recordings-wrapper').css('display','block');
 				var listElement = document.createElement('li'); 
 				listElement.setAttribute('data-id',recordBin.length);
 				listElement.innerHTML = 'RECORDING '+recordBin.length;
