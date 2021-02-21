@@ -62,9 +62,9 @@ body {
     margin:10px;
     overflow: scroll;
     z-index: 99999;
-    @include square(250px);
+    @include square(200px);
     h3 {
-      font-size: 30px;
+      font-size: 25px;
       margin-top:0;
       margin-bottom:10px;
     }

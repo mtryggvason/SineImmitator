@@ -22,7 +22,7 @@ define([
 			var PLAY_SOUND='PLAY';
 			var RECORD_SOUND ='RECORD';
 			var WIDTH = 400;
-			var HEIGHT = 400;
+			var HEIGHT = 300;
 			canvas.width = WIDTH;
 			canvas.height = HEIGHT;
 			var rafId;
