@@ -1,17 +1,13 @@
 {
-  "name": "SoundJunk",
-  "version": "0.1.0",
+  "name": "sine-immitator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Record a sound and hear it re-synthesized using only sine waves.",
+  "type": "module",
   "scripts": {
-    "start": "node_modules/serve/bin/serve.js"
+    "start": "serve ."
   },
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-sass": "~0.6.0",
-    "grunt-contrib-watch": "~0.5.3",
-    "grunt-ftp-deploy": "~0.1.7"
-  },
-  "dependencies": {
-    "phant": "^6.8.0",
-    "serve": "^11.1.0"
+    "serve": "^14.2.4"
   }
 }

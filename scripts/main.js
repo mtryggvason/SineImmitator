@@ -1,14 +1,3 @@
-require.config({
-	baseUrl: 'scripts',
-	paths: {
-		'jquery':'jquery',
-	}
-});
+import { App } from './App.js';
 
-require([
-	'App',
-	], function( App) {
-		'use strict';
-		var app = new App();
-		app.init();
-	});
+new App(document.body).init();

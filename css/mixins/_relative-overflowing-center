@@ -1,7 +1,0 @@
-@mixin relative-overflowing-center($width){
-  @media(max-width:$width){
-    position:relative;
-    left:50%;
-    @include transform(translateX(-50%));
-  }
-}

@@ -1,50 +1,49 @@
-'use strict';
-define([
-	], function(){
-		var context;
-		var oscillatorCount = 50;
-		var oscillators = [];
-		var gains = [];
-		var arpeggiate = function(value){
-			setTimeout(function(){
-				gains[value].gain.linearRampToValueAtTime(1.0, context.currentTime + 0.2);
+// A bank of always-running sine oscillators whose frequency and gain are
+// steered in real time. Parameter changes are smoothed to avoid clicks.
 
-			}, 500 * value);
-		};	
-		var Synthesizer = function(args){
-			context = args.context;
-			this.output = context.createGain();
-			for(var i = 0;i < oscillatorCount; i++) {
-				oscillators[i]= context.createOscillator();
-				gains[i] = context.createGain();
-				gains[i].gain.value=0;
-				oscillators[i].connect(gains[i]);
-				gains[i].connect(this.output);
-			}
-			this.output.gain.value = 1;
+export const MAX_OSCILLATORS = 64;
+const SMOOTHING = 0.015; // seconds (time constant for setTargetAtTime)
 
-			this.play = function(){
-				for(var i = 0; i < oscillatorCount; i++) {
-					oscillators[i].start(0);
-				}
-			};
-			this.stop = function(){
-				for (var i = 0; i<oscillatorCount; i++) {
-					gains[i].gain.value = 0;
-				}
-			};
+export class Synthesizer {
+  constructor(context, count = MAX_OSCILLATORS) {
+    this.context = context;
+    this.output = context.createGain();
+    this.output.gain.value = 0;
 
-			this.setOscillatorFrequency = function(value, index) {
-				oscillators[index].frequency.value =value;
-			};
+    this.voices = Array.from({ length: count }, () => {
+      const osc = new OscillatorNode(context, { type: 'sine', frequency: 440 });
+      const gain = new GainNode(context, { gain: 0 });
+      osc.connect(gain).connect(this.output);
+      osc.start();
+      return { osc, gain };
+    });
+  }
 
-			this.setOscillatorGain = function(value, index) {
-				gains[index].gain.value =value;
-			};
+  get size() {
+    return this.voices.length;
+  }
 
-			this.setVolume = function(value){
-				this.output.gain.value = value;
-			};
-		};
-		return Synthesizer;
-	});
+  /** @param {{frequency:number, gain:number}[]} partials */
+  setPartials(partials) {
+    const now = this.context.currentTime;
+    this.voices.forEach((voice, i) => {
+      const partial = partials[i];
+      if (partial) {
+        voice.osc.frequency.setTargetAtTime(partial.frequency, now, SMOOTHING);
+        voice.gain.gain.setTargetAtTime(partial.gain, now, SMOOTHING);
+      } else {
+        // Silence voices that aren't used this frame instead of leaving them ringing.
+        voice.gain.gain.setTargetAtTime(0, now, SMOOTHING);
+      }
+    });
+  }
+
+  setVolume(value) {
+    this.output.gain.setTargetAtTime(value, this.context.currentTime, SMOOTHING);
+  }
+
+  silence() {
+    this.setPartials([]);
+    this.setVolume(0);
+  }
+}
