@@ -6,7 +6,7 @@ import { RecordingList } from './recording-list.js';
 const STATUS = {
   recording: 'Recording… make some noise.',
   processing: 'Processing…',
-  empty: 'Nothing was recorded.',
+  empty: 'Nothing audible was recorded. Check your microphone.',
   micDenied: 'Microphone access was denied or is unavailable.',
   sine: 'Playing the sine-wave imitation.',
   original: 'Playing the original recording.',
