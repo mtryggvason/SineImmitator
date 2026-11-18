@@ -2,7 +2,7 @@
 
 Record any sound with your microphone and the browser will try to play it back to you using only sine waves.
 
-While a recording plays, the app runs an FFT on it, picks the strongest spectral peaks each frame and steers a bank of sine oscillators to those frequencies and amplitudes. You can play back the sine imitation or the original recording, and choose how many sine waves (1–64) to use.
+While a recording plays, the app runs an FFT on it, picks the strongest spectral peaks each frame and steers a bank of sine oscillators to those frequencies and amplitudes. You can play back the sine imitation or the original recording, and choose how many sine waves (1–128) to use.
 
 Plain HTML, CSS and JavaScript (ES modules) on the Web Audio API and MediaRecorder. No build step.
 

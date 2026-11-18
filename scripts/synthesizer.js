@@ -1,7 +1,7 @@
 // A bank of always-running sine oscillators whose frequency and gain are
 // steered in real time. Parameter changes are smoothed to avoid clicks.
 
-export const MAX_OSCILLATORS = 64;
+export const MAX_OSCILLATORS = 128;
 const SMOOTHING = 0.015; // seconds (time constant for setTargetAtTime)
 
 export class Synthesizer {
