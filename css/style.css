@@ -6,9 +6,17 @@
   --border: #dbe2e7;
   --accent: #e53529;
   --accent-text: #ffffff;
-  --spectrum: rgba(24, 135, 212, 0.35);
-  --grid: rgba(28, 43, 57, 0.07);
   --radius: 14px;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Dot-matrix screen: dark in both themes, like a hardware display. */
+  --screen-bg: #0b0c0d;
+  --screen-bezel: #1c1e20;
+  --screen-text: #8d9296;
+  --dot-off: rgba(255, 255, 255, 0.06);
+  --dot-on: rgba(236, 240, 242, 0.85);
+  --dot-peak: rgba(236, 240, 242, 0.4);
+  --dot-sine: #ff5a3c;
   color-scheme: light dark;
 }
 
@@ -20,8 +28,7 @@
     --muted: #8a99a6;
     --border: #26323d;
     --accent: #ff5a4e;
-    --spectrum: rgba(80, 170, 240, 0.35);
-    --grid: rgba(230, 237, 242, 0.07);
+    --screen-bezel: #2a3036;
   }
 }
 
@@ -53,22 +60,24 @@ body {
 .hero p { margin: 8px auto 0; max-width: 46ch; color: var(--muted); }
 
 .stage {
-  position: relative;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px 12px;
+  background: var(--screen-bg);
+  border: 6px solid var(--screen-bezel);
   border-radius: var(--radius);
-  overflow: hidden;
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.6), 0 10px 30px rgba(0, 0, 0, 0.12);
 }
 .stage canvas { display: block; width: 100%; height: 240px; }
 .status {
-  position: absolute;
-  top: 10px;
-  left: 14px;
-  right: 14px;
+  min-height: 1.4em;
   margin: 0;
-  font-size: 13px;
-  color: var(--muted);
+  font: 11px/1.4 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--screen-text);
 }
+.status:empty::before { content: "Ready"; opacity: 0.6; }
 
 .controls {
   display: flex;
@@ -165,3 +174,18 @@ body {
 .recording[data-playing="original"] [data-mode="original"] {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
 }
+
+.about {
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 15px;
+}
+.about h2 {
+  margin: 16px 0 8px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.about p { margin: 0 0 12px; max-width: 62ch; }
+.about strong { color: var(--text); font-weight: 600; }

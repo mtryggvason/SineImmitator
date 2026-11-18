@@ -16,8 +16,8 @@
     </header>
 
     <section class="stage" aria-label="Spectrum">
-      <canvas aria-label="Frequency spectrum with the chosen sine partials highlighted"></canvas>
       <p class="status js-status" role="status"></p>
+      <canvas aria-label="Frequency spectrum with the chosen sine partials highlighted"></canvas>
     </section>
 
     <section class="controls">
@@ -34,6 +34,30 @@
       <h2 id="recordings-title">Recordings</h2>
       <p class="recordings__empty js-empty">Nothing yet. Hit record, then stop to hear the result.</p>
       <ul class="js-recordings"></ul>
+    </section>
+
+    <section class="about" aria-labelledby="about-title">
+      <h2 id="about-title">Why sine waves?</h2>
+      <p>
+        Sound is air pressure moving back and forth. In the early 1800s Joseph Fourier showed that any such
+        signal can be rebuilt by adding up sine waves, each with its own frequency, loudness and timing.
+        So in principle every sound can be played with sine waves: a voice, a violin or a slammed door.
+      </p>
+      <p>
+        <strong>Pitched sounds need only a few.</strong> A sung note or a whistle is mostly one base frequency
+        (the fundamental) plus <em>harmonics</em> at 2×, 3×, 4×… that frequency. The spacing gives the pitch and the
+        relative loudness of each harmonic gives the timbre, so a handful of sines already sounds close.
+      </p>
+      <p>
+        <strong>Noisy sounds need a lot.</strong> An “s”, a breath or a cymbal spreads its energy over thousands of
+        frequencies with no stable peaks. That’s why they come out warbly here: this app uses at most 64 sines.
+      </p>
+      <p>
+        <strong>How this app does it.</strong> While a recording plays, it splits the sound into its frequencies
+        (a Fourier transform) many times a second, picks the strongest peaks and steers a set of sine oscillators
+        to follow them. On the screen above, the white dots are the recording’s spectrum and the red columns are
+        the sines being played.
+      </p>
     </section>
   </main>
 </body>
