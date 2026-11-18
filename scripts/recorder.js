@@ -13,6 +13,11 @@ export class Recorder {
     this.context = context;
   }
 
+  /** The live mic stream while recording, otherwise null. */
+  get stream() {
+    return this.#stream;
+  }
+
   get isRecording() {
     return this.#mediaRecorder?.state === 'recording';
   }

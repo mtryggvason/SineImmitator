@@ -5,11 +5,12 @@ export const FFT_SIZE = 4096;
 
 /**
  * Plays a recording either as-is ("original") or re-synthesized with sine
- * waves ("sine"). Either way the recording is analysed every animation frame
- * and `onFrame(spectrum, partials)` is called so the UI can draw it.
+ * waves ("sine"), or shows a live input ("monitor") without playing it.
+ * The signal is analysed every animation frame and `onFrame(spectrum, partials)`
+ * is called so the UI can draw it.
  */
 export class Player {
-  #current = null; // AudioBufferSourceNode
+  #current = null; // AudioBufferSourceNode or MediaStreamAudioSourceNode
   #rafId = 0;
 
   constructor(context, { onFrame = () => {}, onStop = () => {} } = {}) {
@@ -52,13 +53,30 @@ export class Player {
     this.#tick();
   }
 
+  /** Analyses a live stream (e.g. the mic while recording) without playing it. */
+  monitor(stream) {
+    this.stop();
+    const source = new MediaStreamAudioSourceNode(this.context, { mediaStream: stream });
+    source.connect(this.analyser);
+    this.#current = source;
+    this.mode = 'monitor';
+    this.#tick();
+  }
+
+  /** Loudest absolute sample in the analyser's current window (0–1). */
+  peakLevel() {
+    const samples = new Float32Array(this.analyser.fftSize);
+    this.analyser.getFloatTimeDomainData(samples);
+    return samples.reduce((peak, x) => Math.max(peak, Math.abs(x)), 0);
+  }
+
   stop() {
     const source = this.#current;
     if (!source) return;
     this.#current = null;
     this.mode = null;
     source.onended = null;
-    try { source.stop(); } catch { /* already stopped */ }
+    try { source.stop?.(); } catch { /* already stopped */ }
     source.disconnect();
 
     cancelAnimationFrame(this.#rafId);

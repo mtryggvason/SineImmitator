@@ -3,8 +3,13 @@ import { Player, FFT_SIZE } from './player.js';
 import { SpectrumView } from './spectrum-view.js';
 import { RecordingList } from './recording-list.js';
 
+const SILENCE = 1e-4;
+const SILENCE_CHECK_MS = 1500;
+
 const STATUS = {
   recording: 'Recording… make some noise.',
+  silentMic: (device) =>
+    `No sound is coming from “${device}”. Check the input device and volume, and that your browser is allowed to use the microphone (macOS: System Settings › Privacy & Security › Microphone).`,
   processing: 'Processing…',
   empty: 'Nothing audible was recorded. Check your microphone.',
   micDenied: 'Microphone access was denied or is unavailable.',
@@ -23,7 +28,10 @@ export class App {
     this.context = new AudioContext();
     this.recorder = new Recorder(this.context);
     this.player = new Player(this.context, {
-      onFrame: (spectrum, partials) => this.spectrumView.draw(spectrum, partials),
+      onFrame: (spectrum, partials) => {
+        this.spectrumView.draw(spectrum, partials);
+        if (this.player.mode === 'monitor') this.inputPeak = Math.max(this.inputPeak, this.player.peakLevel());
+      },
       onStop: () => {
         this.recordings.setPlaying(null);
         this.setStatus('');
@@ -56,6 +64,8 @@ export class App {
   async toggleRecording() {
     await this.context.resume(); // browsers start AudioContext suspended until a user gesture
     if (this.recorder.isRecording) {
+      clearTimeout(this.silenceTimer);
+      this.player.stop();
       this.setRecordingUi(false);
       this.setStatus(STATUS.processing);
       const buffer = await this.recorder.stop();
@@ -68,11 +78,25 @@ export class App {
         await this.recorder.start();
         this.setRecordingUi(true);
         this.setStatus(STATUS.recording);
+        this.watchInput(this.recorder.stream);
       } catch (err) {
         console.error(err);
         this.setStatus(STATUS.micDenied);
       }
     }
+  }
+
+  /** Shows the live mic spectrum and warns if the mic is delivering silence. */
+  watchInput(stream) {
+    this.player.monitor(stream);
+    this.setStatus(STATUS.recording); // monitor() stops playback, which clears the status
+    this.inputPeak = 0;
+    this.silenceTimer = setTimeout(() => {
+      if (this.recorder.isRecording && this.inputPeak < SILENCE) {
+        const device = stream.getAudioTracks()[0]?.label || 'your microphone';
+        this.setStatus(STATUS.silentMic(device));
+      }
+    }, SILENCE_CHECK_MS);
   }
 
   async play(buffer, mode, item) {
