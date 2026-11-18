@@ -23,13 +23,24 @@ export class Synthesizer {
     return this.voices.length;
   }
 
-  /** @param {{frequency:number, gain:number}[]} partials */
+  /**
+   * @param {({frequency:number, gain:number, onset?:boolean}|null)[]} partials
+   *   one entry per voice (by index); null/missing fades that voice out.
+   *   onset = the voice was silent, so jump straight to the new frequency
+   *   instead of gliding there from wherever it was.
+   */
   setPartials(partials) {
     const now = this.context.currentTime;
     this.voices.forEach((voice, i) => {
       const partial = partials[i];
       if (partial) {
-        voice.osc.frequency.setTargetAtTime(partial.frequency, now, SMOOTHING);
+        const { frequency } = voice.osc;
+        if (partial.onset) {
+          frequency.cancelScheduledValues(now);
+          frequency.setValueAtTime(partial.frequency, now);
+        } else {
+          frequency.setTargetAtTime(partial.frequency, now, SMOOTHING);
+        }
         voice.gain.gain.setTargetAtTime(partial.gain, now, SMOOTHING);
       } else {
         // Silence voices that aren't used this frame instead of leaving them ringing.

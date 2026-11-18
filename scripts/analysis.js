@@ -2,6 +2,9 @@
 // of sine partials (frequency + linear amplitude).
 
 const NOISE_FLOOR_DB = -85;
+// Peaks this far below the loudest one in the frame are treated as noise or
+// window side-lobes (Blackman side-lobes sit at about -58 dB) and ignored.
+const RELATIVE_RANGE_DB = 50;
 
 /**
  * @param {Float32Array} spectrumDb  output of AnalyserNode.getFloatFrequencyData
@@ -35,7 +38,8 @@ export function findPeaks(spectrumDb, sampleRate, fftSize, maxPeaks) {
   }
 
   peaks.sort((p, q) => q.db - p.db);
-  return peaks.slice(0, maxPeaks);
+  const cutoff = (peaks[0]?.db ?? 0) - RELATIVE_RANGE_DB;
+  return peaks.filter((p) => p.db >= cutoff).slice(0, maxPeaks);
 }
 
 // AnalyserNode applies a Blackman window (coherent gain ≈ 0.42) and scales by

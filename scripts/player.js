@@ -1,5 +1,6 @@
 import { Synthesizer, MAX_OSCILLATORS } from './synthesizer.js';
 import { findPeaks, toPartials } from './analysis.js';
+import { PartialTracker } from './partial-tracker.js';
 
 export const FFT_SIZE = 4096;
 
@@ -30,6 +31,7 @@ export class Player {
 
     this.synth = new Synthesizer(context, MAX_OSCILLATORS);
     this.synth.output.connect(context.destination);
+    this.tracker = new PartialTracker(this.synth.size);
   }
 
   get maxVoices() {
@@ -81,6 +83,7 @@ export class Player {
 
     cancelAnimationFrame(this.#rafId);
     this.synth.silence();
+    this.tracker.reset();
     this.spectrum.fill(-Infinity);
     this.onFrame(this.spectrum, []);
     this.onStop();
@@ -90,7 +93,7 @@ export class Player {
     this.analyser.getFloatFrequencyData(this.spectrum);
     const peaks = findPeaks(this.spectrum, this.context.sampleRate, FFT_SIZE, this.voiceCount);
     const partials = toPartials(peaks);
-    if (this.mode === 'sine') this.synth.setPartials(partials);
+    if (this.mode === 'sine') this.synth.setPartials(this.tracker.assign(partials));
     this.onFrame(this.spectrum, partials);
     this.#rafId = requestAnimationFrame(this.#tick);
   };
