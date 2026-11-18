@@ -37,3 +37,20 @@ export function findPeaks(spectrumDb, sampleRate, fftSize, maxPeaks) {
   peaks.sort((p, q) => q.db - p.db);
   return peaks.slice(0, maxPeaks);
 }
+
+// AnalyserNode applies a Blackman window (coherent gain ≈ 0.42) and scales by
+// 1/N, so a full-scale sine reads ≈ 0.21 linear. Compensate to get real amplitude.
+const WINDOW_CORRECTION = 1 / 0.21;
+
+/**
+ * Turns spectral peaks into oscillator settings. The sum of gains is kept ≤ 1
+ * so stacking many sines can't clip.
+ * @param {{frequency:number, amplitude:number, db:number}[]} peaks
+ * @returns {{frequency:number, gain:number, db:number}[]}
+ */
+export function toPartials(peaks) {
+  const amps = peaks.map((p) => p.amplitude * WINDOW_CORRECTION);
+  const total = amps.reduce((sum, a) => sum + a, 0);
+  const norm = total > 1 ? 1 / total : 1;
+  return peaks.map((p, i) => ({ frequency: p.frequency, gain: amps[i] * norm, db: p.db }));
+}

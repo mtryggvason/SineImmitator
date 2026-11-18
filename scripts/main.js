@@ -1,3 +1,3 @@
-import { App } from './App.js';
+import { App } from './app.js';
 
 new App(document.body).init();
